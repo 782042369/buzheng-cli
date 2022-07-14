@@ -10,7 +10,7 @@
 ## Install
 
 ```javascript
-  npm install -g buzheng-cli
+  yarn add buzheng-cli global
 ```
 
 ## Api

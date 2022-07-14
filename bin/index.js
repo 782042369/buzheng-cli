@@ -164,10 +164,7 @@ function output (list) {
       const desc = `| ${name} | ${fileSize} | ${compressionSize} | ${compressionRatio} | ${_path} |\n`;
       strMd += desc;
     }
-    const s = `
-    ## 体积变化信息\n
-    | 原始体积 | 压缩后提交 | 压缩比 |\n| -- | -- | -- |\n| ${totalSize} | ${totalMiniSize} | ${contrastSize} |
-    `
+    const s = `## 体积变化信息\n| 原始体积 | 压缩后提交 | 压缩比 |\n| -- | -- | -- |\n| ${totalSize} | ${totalMiniSize} | ${contrastSize} |`
     strMd = strMd + s
     writeFile(mdfileName + '.md', strMd);
   }
@@ -201,7 +198,11 @@ function handleGetFnList () {
         const pathInfo = await fs.readFileSync(item.path)
         const files = await imagemin.buffer(Buffer.from(pathInfo), {
           plugins: [
-            imageminJpegtran(),
+            imageminJpegtran(
+              {
+                arithmetic: true,
+              }
+            ),
             imageminOptipng(),
             imageminGifsicle({
               optimizationLevel: 3

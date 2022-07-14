@@ -1,6 +1,6 @@
 {
   "name": "buzheng-cli",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "基于imagemin的图片压缩cli工具",
   "main": "bin/index.js",
   "author": "782042369@qq.com",
@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "chalk": "4.1.1",
-    "global": "^4.4.0",
     "imagemin": "8.0.1",
     "imagemin-gifsicle": "7.0.0",
     "imagemin-jpegtran": "7.0.0",
@@ -18,10 +17,14 @@
     "imagemin-svgo": "10.0.1",
     "marked": "4.0.18",
     "promise-limit": "2.7.0",
+    "request": "^2.88.2",
     "svgo": "2.8.0",
     "svgo-config": "0.4.1"
   },
   "type": "module",
+  "resolutions": {
+    "bin-wrapper": "npm:bin-wrapper-china"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/782042369/buzheng-cli"
@@ -35,8 +38,5 @@
     "README.md",
     "package.json",
     "yarn.lock"
-  ],
-  "resolutions": {
-    "bin-wrapper": "npm:bin-wrapper-china"
-  }
+  ]
 }
