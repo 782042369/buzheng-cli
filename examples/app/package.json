@@ -1,0 +1,23 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "wai-cli 示例",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "4.1.1",
+    "imagemin": "8.0.1",
+    "imagemin-gifsicle": "7.0.0",
+    "imagemin-jpegtran": "7.0.0",
+    "imagemin-pngquant": "^9.0.2",
+    "imagemin-svgo": "10.0.1",
+    "marked": "4.0.18",
+    "promise-limit": "2.7.0",
+    "svgo": "2.8.0",
+    "svgo-config": "0.4.1"
+  },
+  "type": "module",
+  "resolutions": {
+    "bin-wrapper": "npm:bin-wrapper-china"
+  }
+}
