@@ -1,6 +1,6 @@
 {
   "name": "buzheng-cli",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "基于imagemin的图片压缩cli工具",
   "main": "bin/index.js",
   "author": "782042369@qq.com",
@@ -12,7 +12,7 @@
     "chalk": "4.1.1",
     "imagemin": "8.0.1",
     "imagemin-gifsicle": "7.0.0",
-    "imagemin-jpegtran": "7.0.0",
+    "imagemin-mozjpeg": "^10.0.0",
     "imagemin-optipng": "8.0.0",
     "imagemin-svgo": "10.0.1",
     "marked": "4.0.18",

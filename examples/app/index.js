@@ -5,7 +5,7 @@ import path from "path";
 import chalk from 'chalk';
 import { exec } from 'child_process';
 import imagemin from 'imagemin';
-import imageminJpegtran from 'imagemin-jpegtran';
+import imageminMozjpeg from 'imagemin-mozjpeg';
 import imageminOptipng from 'imagemin-optipng';
 import imageminSvgo from 'imagemin-svgo';
 import imageminGifsicle from 'imagemin-gifsicle';
@@ -198,28 +198,35 @@ function handleGetFnList () {
         const pathInfo = await fs.readFileSync(item.path)
         const files = await imagemin.buffer(Buffer.from(pathInfo), {
           plugins: [
-            imageminJpegtran(
-              {
-                arithmetic: true,
-              }
-            ),
-            imageminOptipng(),
+            imageminMozjpeg({
+              progressive: true,
+              quality: 70
+            }),
+            imageminOptipng({
+              optimizationLevel: 5
+            }),
             imageminGifsicle({
-              optimizationLevel: 3
+              optimizationLevel: 3,
             }),
             imageminSvgo({
               plugins: [{
                 name: 'removeViewBox',
                 active: false
-              }]
+              },
+              {
+                name: "addAttributesToSVGElement",
+                params: {
+                  attributes: [{ xmlns: "http://www.w3.org/2000/svg" }],
+                },
+              },]
             })
           ]
         });
         const fpath = await fs.readFileSync(item.path, 'binary')
         fs.writeFileSync(item.path, files, 'binary')
-        Log(Success(item.path))
         const miniSize = await fs.statSync(item.path).size;
         squashList.push({ ...item, miniSize });
+        Log(Success(item.path))
         resolve();
       } catch (error) {
         Log(Warning(item.path, error))
