@@ -1,12 +1,12 @@
 {
-  "name": "wai-cli",
+  "name": "buzheng-cli",
   "version": "1.0.0",
   "description": "基于imagemin的图片压缩cli工具",
   "main": "bin/index.js",
   "author": "782042369@qq.com",
   "license": "MIT",
   "bin": {
-    "wai-cli": "./bin/index.js"
+    "buzheng-cli": "./bin/index.js"
   },
   "dependencies": {
     "chalk": "4.1.1",
@@ -23,7 +23,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/782042369/wai-cli"
+    "url": "https://github.com/782042369/buzheng-cli"
   },
   "keywords": [
     "imagemin"
