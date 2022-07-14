@@ -4,16 +4,12 @@
 * @constructor
 */
 import fs from 'fs'; //文件模块
-import path from 'path'; //路径模块
 import { marked } from 'marked'; //md转html模块
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 export default class Md2Html {
   constructor(fileName) {
     this.fileName = fileName || 'unnamed';
-    this.target = path.join(__dirname) + '/' + this.fileName + '.md';
+    this.target = this.fileName + '.md';
     this.watchFile();
   }
 
@@ -82,9 +78,8 @@ export default class Md2Html {
     const name = this.fileName; //文件名
     const suffix = 'html'; //文件格式
     const fullName = name + '.' + suffix;  //文件全名
-    const file = path.join(__dirname, fullName); //文件地址
 
-    fs.writeFile(file, content, 'utf-8', err => {
+    fs.writeFile(fullName, content, 'utf-8', err => {
       if (err) {
         throw err;
       }

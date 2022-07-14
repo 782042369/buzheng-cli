@@ -13,8 +13,6 @@ import promiseLimit from 'promise-limit'
 import Md2Html from './Md2Html.js'
 import { fileURLToPath } from 'url';
 import crypto from 'crypto'; //加载加密文件
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 /**
  * 获取 process.argv 参数
  * @param {*} md
@@ -134,7 +132,7 @@ function writeFile (fileName, data) {
   fs.writeFile(fileName, data, 'utf-8', () => {
     Log(Success('文件生成成功'))
     new Md2Html(mdfileName);
-    Log(Success('查看压缩报告：', path.join(__dirname, mdfileName + '.html')))
+    Log(Success('查看压缩报告：', mdfileName + '.html'))
   });
 }
 
