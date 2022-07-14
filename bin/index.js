@@ -3,18 +3,18 @@
 import fs from "fs";
 import path from "path";
 import chalk from 'chalk';
+import { exec } from 'child_process';
 import imagemin from 'imagemin';
 import imageminJpegtran from 'imagemin-jpegtran';
-import imageminPngquant from 'imagemin-pngquant';
+import imageminOptipng from 'imagemin-optipng';
 import imageminSvgo from 'imagemin-svgo';
 import imageminGifsicle from 'imagemin-gifsicle';
 import promiseLimit from 'promise-limit'
-import crypto from 'crypto';
-
-/** 防止任务过多异步队列 */
-const limit = promiseLimit(10)
-
-// 模拟请求队列
+import Md2Html from './Md2Html.js'
+import { fileURLToPath } from 'url';
+import crypto from 'crypto'; //加载加密文件
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 /**
  * 获取 process.argv 参数
  * @param {*} md
@@ -27,6 +27,12 @@ const limit = promiseLimit(10)
  * 图片压缩文件范围，默认src文件夹
  * node index.js folder=src
  * @returns
+ *
+ * @param {*} limit
+ * 压缩图片的任务队列
+ * node index.js limit=20
+ * @returns
+ *
  */
 const args = {}
 process.argv.forEach((val) => {
@@ -35,20 +41,16 @@ process.argv.forEach((val) => {
     args[key] = value
   }
 });
+/** 防止任务过多异步队列 */
+const limit = promiseLimit(args['limit'] || 10)
 
 // 需要处理的文件类型
 const imgsInclude = ['.png', '.jpg', '.svg', '.gif'];
 // 不进行处理的文件夹
 const filesExclude = ['node_modules'];
 
-const urls = [
-  "tinyjpg.com",
-  "tinypng.com"
-];
 
 const Log = console.log
-const Time = console.time
-const TimeEnd = console.timeEnd
 
 const Success = chalk.green
 const Error = chalk.bold.red;
@@ -62,10 +64,10 @@ let filesList = []
 
 // 压缩后文件列表
 const squashList = []
-
+// md文件名称
+const mdfileName = '图片压缩比'
 // 判断文件是否存在
 function access (dir) {
-  console.log('dir: ', dir);
   return new Promise((resolve, reject) => {
     fs.access(dir, fs.constants.F_OK, async err => {
       if (!err) {
@@ -89,9 +91,8 @@ function read (dir) {
     })
   })
 }
-
 // md5
-function md5 (str) {
+function md5 (str) { //暴露出md5s方法
   const md5 = crypto.createHash('md5');
   md5.update(str);
   str = md5.digest('hex');
@@ -132,6 +133,8 @@ function getFileList (filePath) {
 function writeFile (fileName, data) {
   fs.writeFile(fileName, data, 'utf-8', () => {
     Log(Success('文件生成成功'))
+    new Md2Html(mdfileName);
+    Log(Success('查看压缩报告：', path.join(__dirname, mdfileName + '.html')))
   });
 }
 
@@ -139,31 +142,44 @@ function transformSize (size) {
   return size > 1024 ? (size / 1024).toFixed(2) + 'KB' : size + 'B'
 }
 
-let str = `# 项目原始图片对比\n
+let strMd = `# 项目原始图片对比\n
 ## 图片压缩信息\n
 | 文件名 | 文件体积 | 压缩后体积 | 压缩比 | 文件路径 |\n| -- | -- | -- | -- | -- |\n`;
 
 function output (list) {
-  console.log('list: ', list);
-  for (let i = 0; i < list.length; i++) {
-    const { name, path: _path, size, miniSize } = list[i];
-    const fileSize = `${transformSize(size)}`;
-    const compressionSize = `${transformSize(miniSize)}`;
-    const compressionRatio = `${(100 * (size - miniSize) / size).toFixed(2) + '%'}`;
-    const desc = `| ${name} | ${fileSize} | ${compressionSize} | ${compressionRatio} | ${_path} |\n`;
-    str += desc;
-  }
-  let size = 0, miniSize = 0
+  let countSize = 0, countMiniSize = 0
   list.forEach(item => {
-    size += item.size
-    miniSize += item.miniSize
+    countSize += item.size
+    countMiniSize += item.miniSize
   })
-  const s = `
-## 体积变化信息\n
-| 原始体积 | 压缩后提交 | 压缩比 |\n| -- | -- | -- |\n| ${transformSize(size)} | ${transformSize(miniSize)} | ${(100 * (size - miniSize) / size).toFixed(2) + '%'} |
-  `
-  str = str + s
-  writeFile('图片压缩比.md', str);
+
+  const totalSize = transformSize(countSize)
+  const totalMiniSize = transformSize(countMiniSize)
+  const contrastSize = (100 * (countSize - countMiniSize) / countSize).toFixed(2) + '%'
+
+  if (args['md']) {
+    for (let i = 0; i < list.length; i++) {
+      const { name, path: _path, size, miniSize } = list[i];
+      const fileSize = `${transformSize(size)}`;
+      const compressionSize = `${transformSize(miniSize)}`;
+      const compressionRatio = `${(100 * (size - miniSize) / size).toFixed(2) + '%'}`;
+      const desc = `| ${name} | ${fileSize} | ${compressionSize} | ${compressionRatio} | ${_path} |\n`;
+      strMd += desc;
+    }
+    const s = `
+    ## 体积变化信息\n
+    | 原始体积 | 压缩后提交 | 压缩比 |\n| -- | -- | -- |\n| ${totalSize} | ${totalMiniSize} | ${contrastSize} |
+    `
+    strMd = strMd + s
+    writeFile(mdfileName + '.md', strMd);
+  }
+  Log(Success(`
+    压缩对比：
+    原始体积${totalSize};
+    压缩后提交${totalMiniSize};
+    压缩比${contrastSize};
+  `))
+
 }
 
 // 生成文件指纹
@@ -188,10 +204,10 @@ function handleGetFnList () {
         const files = await imagemin.buffer(Buffer.from(pathInfo), {
           plugins: [
             imageminJpegtran(),
-            imageminPngquant({
-              quality: [0.6, 0.8]
+            imageminOptipng(),
+            imageminGifsicle({
+              optimizationLevel: 3
             }),
-            imageminGifsicle(),
             imageminSvgo({
               plugins: [{
                 name: 'removeViewBox',
@@ -207,7 +223,7 @@ function handleGetFnList () {
         squashList.push({ ...item, miniSize });
         resolve();
       } catch (error) {
-        Log(Error(item.path, error))
+        Log(Warning(item.path, error))
       }
     }))
   })
@@ -217,18 +233,16 @@ function squash () {
     const squashArr = handleGetFnList()
     if (squashArr.length === 0) {
       Log(Success('没有需要压缩的图片'))
-      TimeEnd('squash time')
+      console.timeEnd('squash time')
       return
     }
     Promise.all(squashArr).then(() => {
-      if (args['md']) {
-        output(squashList);
-      }
+      output(squashList);
       fingerprint()
-      TimeEnd('squash time')
+      console.timeEnd('squash time')
     })
   } catch (error) {
-    Log(Error('squash error:' + error))
+    Log(Warning('squash error:' + error))
     return Promise.reject(error)
   }
 }
@@ -256,5 +270,5 @@ async function start () {
   }
 }
 
-Time('squash time')
+console.time('squash time')
 start()

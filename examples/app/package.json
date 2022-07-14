@@ -9,7 +9,7 @@
     "imagemin": "8.0.1",
     "imagemin-gifsicle": "7.0.0",
     "imagemin-jpegtran": "7.0.0",
-    "imagemin-pngquant": "^9.0.2",
+    "imagemin-optipng": "8.0.0",
     "imagemin-svgo": "10.0.1",
     "marked": "4.0.18",
     "promise-limit": "2.7.0",

@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import { exec } from 'child_process';
 import imagemin from 'imagemin';
 import imageminJpegtran from 'imagemin-jpegtran';
-import imageminPngquant from 'imagemin-pngquant';
+import imageminOptipng from 'imagemin-optipng';
 import imageminSvgo from 'imagemin-svgo';
 import imageminGifsicle from 'imagemin-gifsicle';
 import promiseLimit from 'promise-limit'
@@ -204,9 +204,7 @@ function handleGetFnList () {
         const files = await imagemin.buffer(Buffer.from(pathInfo), {
           plugins: [
             imageminJpegtran(),
-            imageminPngquant({
-              quality: [0.6, 0.8]
-            }),
+            imageminOptipng(),
             imageminGifsicle({
               optimizationLevel: 3
             }),
