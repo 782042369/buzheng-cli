@@ -34,5 +34,8 @@
     "README.md",
     "package.json",
     "yarn.lock"
-  ]
+  ],
+  "resolutions": {
+    "bin-wrapper": "npm:bin-wrapper-china"
+  }
 }
