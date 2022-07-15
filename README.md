@@ -4,8 +4,8 @@
 
 ## 开发环境
 
-- Node.js 14.17.0
-- yarn 1.22.19
+-   Node.js 14.17.0
+-   yarn 1.22.19
 
 ## Install
 
@@ -16,26 +16,32 @@
 ## Api
 
 ```javascript
-  npx buzheng-cli
+  默认命令： buzheng-cli
 ```
 
 如果需要指定图片压缩的文件，请添加 folder 参数，默认为项目目录下的 src 文件夹
 
 ```javascript
   // 修改为处理config文件夹下内容
-  npx buzheng-cli folder=config
+  buzheng-cli folder=config
 ```
 
 如果要生成图片压缩比等信息，请添加 md 参数，默认不开启
 
 ```javascript
-  npx buzheng-cli md=true
+  buzheng-cli md=true
+```
+
+默认任务执行队列 10，可以自定义
+
+```javascript
+  buzheng-cli limit=5
 ```
 
 完整命令：
 
 ```javascript
-  npx buzheng-cli folder=src md=true
+  buzheng-cli folder=src md=true limit=5
 ```
 
 ## Examples

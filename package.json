@@ -1,6 +1,6 @@
 {
   "name": "buzheng-cli",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "基于imagemin的图片压缩cli工具",
   "main": "bin/index.js",
   "author": "782042369@qq.com",
